@@ -13,6 +13,16 @@ pipeline {
         }
 	  }
     }
+    stage('SonarQube analysis') {
+    	steps {
+			//-Dsonar.auth.token=${SONAR_AUTH_TOKEN} -Dsonar.login=${SONAR_LOGIN} -Dsonar.password=${SONAR_PASSWORD} -Dsonar.jdbc.url=${SONAR_JDBC_URL} -Dsonar.jdbc.username=${SONAR_JDBC_USERNAME} -Dsonar.jdbc.password=${SONAR_JDBC_PASSWORD}  -Dsonar.login=$SONAR_UN -Dsonar.password=$SONAR_PW"
+	  		wrap([$class: 'Xvnc', takeScreenshot: false, useXauthority: true]) {
+          		sh '''
+          			mvn -Dmaven.test.skip=true -Dsonar.host.url=https://sonar.eclipse.org/ -Dsonar.projectKey=org.polarsys:org.polarsys.kitalpha -Dsonar.jdbc.url=jdbc:mysql://dbmaster:3306/sonar?autoReconnect=true&useUnicode=true&characterEncoding=utf8 install sonar:sonar -PKitalphaSonar
+          		'''
+          	}
+        }
+    }
     stage('Deploy') {
       when {
          not { changeRequest() }
